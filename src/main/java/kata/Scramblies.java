@@ -8,7 +8,7 @@ import static java.util.stream.Collectors.*;
 /**
  * <a href="https://www.codewars.com/kata/55c04b4cc56a697bb0000048/train/java">Kata details</a>
  */
-public class Scramblies {
+public final class Scramblies {
 
     public static boolean scramble(String str1, String str2) {
         var patternBuilder = new StringBuilder();

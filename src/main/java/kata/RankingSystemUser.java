@@ -8,26 +8,50 @@ import static java.lang.Math.abs;
 public final class RankingSystemUser {
 
     private static final int PROGRESS_CAP = 100;
-    private int rank = -8;
-    private int progress = 0;
+    public int rank = -8;
+    public int progress = 0;
 
-    public void incProgress(int rank) {
-        if(rank < -8 || rank == 0 || rank > 8) {
+    public void incProgress(int appliedRank) {
+        if(appliedRank < -8 || appliedRank == 0 || appliedRank > 8) {
             throw new IllegalArgumentException();
         }
-        int diff = abs(this.rank - rank) + 1;
-        int impact = 10 * diff * diff;
-        progress += impact;
-        while(progress >= PROGRESS_CAP && this.rank < 8) {
-            progress -= PROGRESS_CAP;
-            if(this.rank == -1)
-                this.rank = 1;
-            else
-                this.rank++;
+        if(rank == 8) {
+            return;
+        }
+        progress += evaluateImpact(appliedRank);
+        while(progress >= PROGRESS_CAP) {
+            switch(rank) {
+                case 7 -> {
+                    rank++;
+                    progress = 0;
+                }
+                case -1 -> {
+                    rank = 1;
+                    progress -= PROGRESS_CAP;
+                }
+                default -> {
+                    rank++;
+                    progress -= PROGRESS_CAP;
+                }
+            }
         }
     }
 
-    public int getRank() {
-        return rank;
+    private int evaluateImpact(int appliedRank) {
+        int diff = (areOnEitherSides(rank, appliedRank) ||
+                    areOnEitherSides(appliedRank, rank))
+                ? abs(rank - appliedRank) - 1
+                : abs(rank - appliedRank);
+        return (rank < appliedRank)
+                ? 10 * diff * diff
+                : switch(diff) {
+                    case 0 -> 3;
+                    case 1 -> 1;
+                    default -> 0;
+                };
+    }
+
+    private boolean areOnEitherSides(int rank1, int rank2) {
+        return rank1 < 0 && rank2 > 0;
     }
 }

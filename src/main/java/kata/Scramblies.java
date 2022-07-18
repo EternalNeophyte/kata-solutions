@@ -6,7 +6,7 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
 
 /**
- * <a href="https://www.codewars.com/kata/55c04b4cc56a697bb0000048/train/java">Kata details</a>
+ * <a href="https://www.codewars.com/kata/55c04b4cc56a697bb0000048/java">Kata details</a>
  */
 public final class Scramblies {
 

@@ -1,82 +1,52 @@
 package kata;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toUnmodifiableMap;
 
 /**
  * <a href="https://www.codewars.com/kata/525c7c5ab6aecef16e0001a5/java">Kata details</a>
  */
 public final class IntParser {
 
-    public static final Map<String, Integer> BASES = Map.of(
-            "zero", 0,
-            "hundred", 100,
-            "thousand", 1_000,
-            "million", 1_000_000
-    );
-    public static final Map<String, Integer> NUMBERS = new HashMap<>();
+    public static final Map<String, Integer> NUMBERS;
+    public static final Map<String, Integer> BASES;
 
     static {
-        NUMBERS.put("one", 1);
+        var definitions = new String[] {
+                "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+                "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty",
+                "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"
+        };
+        AtomicInteger value = new AtomicInteger(1);
+        NUMBERS = Arrays.stream(definitions)
+                        .collect(toUnmodifiableMap(identity(),
+                                definition -> value.getAndAdd(definition.endsWith("ty") ? 10 : 1))
+                        );
+        BASES = Map.of(
+                "zero", 0,
+                "hundred", 100,
+                "thousand", 1_000,
+                "million", 1_000_000
+        );
     }
 
     public static int parseInt(String numStr) {
-/*        AtomicInteger result = new AtomicInteger(), basedValue = new AtomicInteger(1);
-        for(String key : numStr.split("\\s+|-|and")) {
-            Optional.ofNullable(NUMBERS.get(key))
-                    .ifPresentOrElse(basedValue::addAndGet, () -> {
-                        Optional.ofNullable(BASES.get(key))
-                                .
-                    })
-            int value = ;
-            if(value != 0) {
-                basedValue += value;
+        int result = 0, base = 0;
+        for(String definition : numStr.split("[\\s-]+(and)?[\\s-]*")) {
+            Integer current = NUMBERS.get(definition);
+            if(current != null) {
+                base += current;
             }
             else {
-                value = ;
-                result += basedValue * value;
-                basedValue = 0;
+                current = Objects.requireNonNull(BASES.get(definition), "Unknown number: " + definition);
+                result += (base == 0) ? current : base * current;
+                base = 0;
             }
         }
-        return result + basedValue;*/
-        return 0;
+        return result + base;
     }
 
-    interface WordNumeral {
-        int apply(int input);
-    }
-
-    enum Base implements WordNumeral {
-        HUNDRED(100);
-
-        final int value;
-
-        Base(int value) {
-            this.value = value;
-        }
-
-        @Override
-        public int apply(int input) {
-            return input * value;
-        }
-    }
-
-    enum Fraction implements WordNumeral {
-        ONE(1),
-        TWO(2),
-        ;
-        final int value;
-
-        Fraction(int value) {
-            this.value = value;
-        }
-
-        @Override
-        public int apply(int input) {
-            return input + value;
-        }
-    }
 }

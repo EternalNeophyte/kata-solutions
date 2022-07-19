@@ -34,19 +34,31 @@ public final class IntParser {
     }
 
     public static int parseInt(String numStr) {
-        int result = 0, base = 0;
+        int result = 0, based = 0;
         for(String definition : numStr.split("[\\s-]+(and)?[\\s-]*")) {
             Integer current = NUMBERS.get(definition);
             if(current != null) {
-                base += current;
+                based += current;
             }
             else {
                 current = Objects.requireNonNull(BASES.get(definition), "Unknown number: " + definition);
-                result += (base == 0) ? current : base * current;
-                base = 0;
+                if(based != 0) {
+                    based += result;
+                    based *= current;
+                    if(based > result) {
+                        result = based;
+                    }
+                    else {
+                        result += based;
+                    }
+                }
+                else {
+                    result = current;
+                }
+                based = 0;
             }
         }
-        return result + base;
+        return result + based;
     }
 
 }

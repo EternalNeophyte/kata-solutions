@@ -42,23 +42,16 @@ public final class IntParser {
             }
             else {
                 current = Objects.requireNonNull(BASES.get(definition), "Unknown number: " + definition);
-                if(based != 0) {
-                    based += result;
-                    based *= current;
-                    if(based > result) {
-                        result = based;
-                    }
-                    else {
-                        result += based;
-                    }
-                }
-                else {
-                    result = current;
-                }
+                result = (based == 0)
+                        ? (result == 0)
+                            ? current
+                            : result * current
+                        : (current > result)
+                            ? (based + result) * current
+                            : result + based * current;
                 based = 0;
             }
         }
         return result + based;
     }
-
 }

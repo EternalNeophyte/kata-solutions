@@ -2,6 +2,7 @@ package kata;
 
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -67,10 +68,10 @@ public final class RoboScript {
             this.move = move;
         }
 
-        static Direction of(String literal) {
+        static Direction of(char literal) {
             return switch (literal) {
-                case "L" -> LEFT;
-                case "R" -> RIGHT;
+                case 'L' -> LEFT;
+                case 'R' -> RIGHT;
                 default -> UP;
             };
         }

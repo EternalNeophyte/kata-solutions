@@ -25,7 +25,7 @@ public final class NextBiggerNumber {
             }
         }
         List<Long> list = candidates.stream().sorted().toList();
-        return list.isEmpty() ? -1 : list.get(list.indexOf(n) + 1);
+        return list.size() <= 1 ? -1 : list.get(list.indexOf(n) + 1);
     }
 
     private static void swap(int[] digits, int i) {

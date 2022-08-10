@@ -1,7 +1,7 @@
 package kata;
 
-import java.util.Arrays;
-import java.util.Comparator;
+import java.nio.CharBuffer;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
@@ -30,4 +30,17 @@ public final class PigLatinAndOrder {
                         .filter(occurences -> occurences > 1)
                         .count();
     }
+
+    public static boolean isValid(char[] walk) {
+        if(walk.length != 10)
+            return false;
+        var moves = CharBuffer.wrap(walk)
+                .chars()
+                .mapToObj(i -> (char) i)
+                .collect(groupingBy(identity(), counting()));
+        return Objects.equals(moves.get('n'), moves.get('s')) &&
+                Objects.equals(moves.get('w'), moves.get('e'));
+    }
+
+
 }

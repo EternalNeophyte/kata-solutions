@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
 import static java.util.function.Function.identity;
@@ -70,5 +71,11 @@ public final class SimpleKatas {
         System.out.println(1337 + " - " + regexBelow(1337));
         System.out.println(67345 + " - " +  regexBelow(67345));
         System.out.println(Pattern.compile("[\\D\\W]").matcher(String.valueOf(0)).find());
+    }
+
+    static String toCamelCase(String s){
+        return Pattern.compile("(?<=[\\W_])[\\w]")
+                .matcher(s)
+                .replaceAll(m -> m.group().substring(1).toUpperCase());
     }
 }

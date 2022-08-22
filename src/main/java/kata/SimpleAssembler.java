@@ -9,29 +9,29 @@ public final class SimpleAssembler {
 
 
     public static Map<String, Integer> interpret(String[] program){
-        Map<String, Integer> variables = new HashMap<>();
+        Map<String, Integer> vars = new HashMap<>();
         List<Command> commands = Arrays.stream(program)
                 .map(SimpleAssembler::toCommand)
                 .toList();
-        commands.forEach(command -> command.execute(variables, commands, commands.indexOf(command)));
-        return variables;
+        for(int i = 0; i < commands.size(); i++)
+            commands.get(i).execute(vars, commands, i);
+        return vars;
     }
 
     private static Command toCommand(String statement) {
         String[] lexems = statement.split(" ");
         return switch(lexems[0]) {
             case "mov" -> (vars, commands, i) -> {
-                int value = retrieveValue(vars, lexems[2]);
+                int value = lexems[2].matches("-?\\d+") ? Integer.parseInt(lexems[2]) : vars.get(lexems[2]);
                 vars.put(lexems[1], value);
-                return value;
             };
             case "jnz" -> (vars, commands, i) -> {
-                int target = i + Integer.parseInt(lexems[2]), result = retrieveValue(vars, lexems[1]);
-                var command = commands.get(target);
+                int target = i + Integer.parseInt(lexems[2]);
+                var loop = (target < i)
+                        ? commands.subList(target, i)
+                        : commands.subList(i, target);
                 while(vars.get(lexems[1]) != 0)
-                    //ToDo all commands in range target-this
-                    result = command.execute(vars, commands, i);
-                return result;
+                    loop.forEach(command -> command.execute(vars, commands, i));
             };
             case "inc" -> (vars, commands, i) -> vars.merge(lexems[1], 1, Integer::sum);
             case "dec" -> (vars, commands, i) -> vars.merge(lexems[1], -1, Integer::sum);
@@ -39,12 +39,8 @@ public final class SimpleAssembler {
         };
     }
 
-    private static int retrieveValue(Map<String, Integer> variables, String lexem) {
-        return lexem.matches("-?\\d+") ? Integer.parseInt(lexem) : variables.get(lexem);
-    }
-
     interface Command {
-        int execute(Map<String, Integer> variables, List<Command> allCommands, int index);
+        void execute(Map<String, Integer> variables, List<Command> allCommands, int index);
     }
 
 }

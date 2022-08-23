@@ -1,5 +1,6 @@
 package kata;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -68,14 +69,41 @@ public final class SimpleKatas {
     }
 
     public static void main(String[] args) {
-        System.out.println(1337 + " - " + regexBelow(1337));
-        System.out.println(67345 + " - " +  regexBelow(67345));
-        System.out.println(Pattern.compile("[\\D\\W]").matcher(String.valueOf(0)).find());
+        System.out.println(incrementString("wqef00423653468478897679863457647578768688923"));
+        System.out.println(incrementString("wqef"));
+        System.out.println(incrementString("wqef0023"));
+        System.out.println(incrementString("wqef000"));
+        System.out.println(incrementString("foobar099"));
+        System.out.println(incrementString("foobar99"));
+        System.out.println(incrementString(""));
     }
 
     static String toCamelCase(String s){
         return Pattern.compile("(?<=[\\W_])[\\w]")
                 .matcher(s)
                 .replaceAll(m -> m.group().substring(1).toUpperCase());
+    }
+
+    public static String incrementString(String str) {
+        return Pattern.compile("([\\D]*)([0]*)(\\d*?)(\\d{0,18}$)")
+                .matcher(str)
+                .replaceFirst(matchResult -> {
+                    StringBuilder result = new StringBuilder(matchResult.group(1));
+                    String zeros = matchResult.group(2), overflow = matchResult.group(3), number = matchResult.group(4);
+                    if(number.isEmpty()) {
+                        if(!zeros.isEmpty())
+                            result.append(zeros.substring(1));
+                        result.append("1");
+                    }
+                    else {
+                        String incremented = String.valueOf(Long.parseLong(number) + 1);
+                        int lenDiff = incremented.length() - number.length();
+                        if(!zeros.isEmpty())
+                            result.append(zeros.replaceFirst("[0]{" + lenDiff + "}$", overflow + incremented));
+                        else
+                            result.append(overflow).append(incremented);
+                    }
+                    return result.toString();
+                });
     }
 }

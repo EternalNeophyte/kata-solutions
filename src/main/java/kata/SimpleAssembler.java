@@ -4,13 +4,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-
 public final class SimpleAssembler {
 
     interface Command {
-        void execute(Map<String, Integer> variables, Command[] commands, int index);
+        int execute(Map<String, Integer> variables, Command[] commands, int index);
     }
 
     public static Map<String, Integer> interpret(String[] program){
@@ -25,13 +22,28 @@ public final class SimpleAssembler {
     private static Command toCommand(String statement) {
         String[] lexems = statement.split(" ");
         return switch(lexems[0]) {
-            case "mov" -> (vars, commands, i) -> vars.put(lexems[1], getOrParse(vars, lexems[2]));
-            case "inc" -> (vars, commands, i) -> vars.merge(lexems[1], 1, Integer::sum);
-            case "dec" -> (vars, commands, i) -> vars.merge(lexems[1], -1, Integer::sum);
+            case "mov" -> (vars, commands, i) -> {
+                vars.put(lexems[1], getOrParse(vars, lexems[2]));
+                return ++i;
+            };
+            case "inc" -> (vars, commands, i) -> {
+                vars.merge(lexems[1], 1, Integer::sum);
+                return ++i;
+            };
+            case "dec" -> (vars, commands, i) -> {
+                vars.merge(lexems[1], -1, Integer::sum);
+                return ++i;
+            };
             case "jnz" -> (vars, commands, i) -> {
                 int target = i + Integer.parseInt(lexems[2]);
-                while(getOrParse(vars, lexems[1]) != 0)
-                    executeAll(vars, commands, min(target, i), max(target, i));
+                if(target < i) {
+                    while(operandIsNotZero(vars, lexems[1]))
+                        executeAll(vars, commands, target, i);
+                    return ++i;
+                }
+                else {
+                    return operandIsNotZero(vars, lexems[1]) ? target : ++i;
+                }
             };
             default -> throw new IllegalStateException("Unexpected statement: " + statement);
         };
@@ -42,8 +54,11 @@ public final class SimpleAssembler {
         return (value != null) ? value : Integer.parseInt(lexem);
     }
 
+    private static boolean operandIsNotZero(Map<String, Integer> variables, String lexem) {
+        return getOrParse(variables, lexem) != 0;
+    }
+
     private static void executeAll(Map<String, Integer> variables, Command[] commands, int index, int bound) {
-        for( ; index < bound; index++)
-            commands[index].execute(variables, commands, index);
+        for( ; index < bound; index = commands[index].execute(variables, commands, index));
     }
 }

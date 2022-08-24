@@ -69,13 +69,16 @@ public final class SimpleKatas {
     }
 
     public static void main(String[] args) {
-        System.out.println(incrementString("wqef00423653468478897679863457647578768688923"));
+/*        System.out.println(incrementString("wqef00423653468478897679863457647578768688923"));
         System.out.println(incrementString("wqef"));
         System.out.println(incrementString("wqef0023"));
         System.out.println(incrementString("wqef000"));
         System.out.println(incrementString("foobar099"));
         System.out.println(incrementString("foobar99"));
-        System.out.println(incrementString(""));
+        System.out.println(incrementString("<J*DHTS6Nu64uK3'QY\\\\[0"));
+        System.out.println(incrementString(""));*/
+        System.out.println(incrementString("rS>I>N)|!E+TxLouRP~\\495499481666650942316873546411711"));
+
     }
 
     static String toCamelCase(String s){
@@ -85,11 +88,11 @@ public final class SimpleKatas {
     }
 
     public static String incrementString(String str) {
-        return Pattern.compile("([\\D]*)([0]*)(\\d*?)(\\d{0,18}$)")
+       return Pattern.compile("([\\.\\\\]*?)(\\\\*)([0]*)(\\d*?)(\\d{0,18}$)")
                 .matcher(str)
                 .replaceFirst(matchResult -> {
-                    StringBuilder result = new StringBuilder(matchResult.group(1));
-                    String zeros = matchResult.group(2), overflow = matchResult.group(3), number = matchResult.group(4);
+                    StringBuilder result = new StringBuilder(matchResult.group(1)).append(matchResult.group(2));
+                    String zeros = matchResult.group(3), overflow = matchResult.group(4), number = matchResult.group(5);
                     if(number.isEmpty()) {
                         if(!zeros.isEmpty())
                             result.append(zeros.substring(1));
@@ -99,11 +102,14 @@ public final class SimpleKatas {
                         String incremented = String.valueOf(Long.parseLong(number) + 1);
                         int lenDiff = incremented.length() - number.length();
                         if(!zeros.isEmpty())
-                            result.append(zeros.replaceFirst("[0]{" + lenDiff + "}$", overflow + incremented));
-                        else
-                            result.append(overflow).append(incremented);
+                            result.append(zeros.substring(0, zeros.length() - lenDiff));
+                        result.append(overflow);
+                        if(number.startsWith("0"))
+                            result.append(number.split("[^0]+")[0]);
+                        result.append(incremented);
                     }
                     return result.toString();
-                });
+                })
+               .replaceAll("\\\\", "\\\\");
     }
 }
